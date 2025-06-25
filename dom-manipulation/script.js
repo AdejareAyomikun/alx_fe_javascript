@@ -619,7 +619,7 @@ async function syncQuotes() {
       quotes = Array.from(new Map(allQuotes.map((q) => [q.text, q])).values());
       saveQuotes();
       populateCategories();
-      showNotification("Synced with server. Server data has been merged.");
+      showNotification("Quotes synced with server!");
     }
   } catch (error) {
     console.error("Error syncing with server:", error);
