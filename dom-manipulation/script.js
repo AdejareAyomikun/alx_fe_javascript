@@ -587,26 +587,6 @@ function exportQuotesToJson() {
   URL.revokeObjectURL(url);
 }
 
-async function fetchQuotesFromServer() {
-  try {
-    const response = await fetch(SERVER_URL);
-    const data = await response.json();
-    if (Array.isArray(data)) {
-      const serverQuotes = data.map((post) => ({
-        text: post.title,
-        category: "server",
-      }));
-      const allQuotes = [...serverQuotes, ...quotes];
-      quotes = Array.from(new Map(allQuotes.map((q) => [q.text, q])).values());
-      saveQuotes();
-      populateCategories();
-      showNotification("Synced with server. Server data has been merged.");
-    }
-  } catch (error) {
-    console.error("Error syncing with server:", error);
-  }
-}
-
 async function sendQuoteToServer(quote) {
   try {
     const response = await fetch(SERVER_URL, {
@@ -623,6 +603,26 @@ async function sendQuoteToServer(quote) {
     }
   } catch (err) {
     console.error("Error posting quote:", err);
+  }
+}
+
+async function syncQuotes() {
+  try {
+    const response = await fetch(SERVER_URL);
+    const data = await response.json();
+    if (Array.isArray(data)) {
+      const serverQuotes = data.map((post) => ({
+        text: post.title,
+        category: "server",
+      }));
+      const allQuotes = [...serverQuotes, ...quotes];
+      quotes = Array.from(new Map(allQuotes.map((q) => [q.text, q])).values());
+      saveQuotes();
+      populateCategories();
+      showNotification("Synced with server. Server data has been merged.");
+    }
+  } catch (error) {
+    console.error("Error syncing with server:", error);
   }
 }
 
@@ -644,5 +644,5 @@ if (lastQuote) {
   quoteDisplay.innerHTML = `"${quote.text}" — <strong>[${quote.category}]</strong>`;
 }
 
-fetchQuotesFromServer();
-setInterval(fetchQuotesFromServer, 60000);
+syncQuotes();
+setInterval(syncQuotes, 60000);
